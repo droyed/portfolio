@@ -143,4 +143,6 @@ These observations highlight that, with larger models, it becomes increasingly c
 | yolov11-x | 1873.92      | 0.0348          | 478.12       | 0.0333          | 478.12       | 0.0325          | 28.15        | 8.0073          |
 
 Let's use approach #0, the original approach, as our baseline for comparison.  
+
+The plot is shown below -
 ![[attention_optimization___plots_allapproaches.png]]
