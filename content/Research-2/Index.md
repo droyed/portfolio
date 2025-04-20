@@ -1,11 +1,14 @@
 ---
 longform:
   format: scenes
-  title: Research
+  title: Portfolio
   workflow: Default Workflow
   sceneFolder: /
   scenes:
+    - Introduction
     - Attention
   sceneTemplate: templates/chapter.md
-  ignoredFiles: []
+  ignoredFiles:
+    - Attention
+    - Untitled
 ---

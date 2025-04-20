@@ -2,8 +2,6 @@
 title: Attention Kernel Optimization - YOLO as context
 draft: false
 tags:
-  - ML
-  - Optimisation
 ---
 ## Backstory
 I was performing object detection by running the YOLO inference/prediction method on an image. The images used were approximately 6000 × 3000 pixels in resolution. To achieve optimal performance, I employed the highest-performing models available — YOLOv11-L and YOLOv11-X. However, I soon encountered memory issues, with the traceback indicating that the error occurred during the forward pass of PyTorch’s `nn/Block` module, specifically within one of the following lines -
@@ -142,4 +140,4 @@ These observations highlight that, with larger models, it becomes increasingly c
 | yolov11-m | 1249.28      | 0.024           | 475          | 0.0225          | 475          | 0.0228          | 18.77        | 5.31            |
 | yolov11-x | 1873.92      | 0.0348          | 478.12       | 0.0333          | 478.12       | 0.0325          | 28.15        | 8.0073          |
 
-Let's use approach #0, the original approach, as our baseline for comparison.  
+Let's use approach #0, the original approach, as our baseline for comparison. 
