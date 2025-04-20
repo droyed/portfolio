@@ -142,7 +142,22 @@ These observations highlight that, with larger models, it becomes increasingly c
 | yolov11-m | 1249.28      | 0.024           | 475          | 0.0225          | 475          | 0.0228          | 18.77        | 5.31            |
 | yolov11-x | 1873.92      | 0.0348          | 478.12       | 0.0333          | 478.12       | 0.0325          | 28.15        | 8.0073          |
 
-Let's use approach #0, the original approach, as our baseline for comparison.  
-
-The plot is shown below -
+Let's use approach #0, the original approach, as our baseline for comparison -
 ![[attention_optimization___plots_allapproaches.png]]
+
+As previously discussed and now observed, the final approach is primarily suited for highly memory-constrained scenarios, achieving an impressive 99.6% reduction in memory usage compared to the baseline. However, this comes at the cost of significantly degraded runtime performance. Therefore, we shift our focus to the other approaches. To better highlight the relevant figures, we exclude the final approach and re-plot the results accordingly, as shown below -
+![[attention_optimization___plots_allapproaches_but last 1.png]]
+
+### Key Observations
+
+- The primary advantage of the proposed solution is the significant memory savings of up to ~75%, with these gains becoming even more substantial as model size increases. Importantly, this likely shifts the peak memory usage of the YOLO inference pipeline away from this section of code. This shift is critical, as it enables the use of larger YOLO models that might otherwise be infeasible due to memory constraints, thereby avoiding a fallback to smaller, less capable models and preserving overall solution performance.
+- Additionally, a modest runtime improvement of approximately 5–9% further contributes to the overall efficiency gains.
+- For smaller arrays, however, the improvements may be negligible, and applying these optimizations might not be justified—particularly when processing large batches of smaller images.
+
+Given those numbers, if one has to pick one among the proposed approaches, approach # 2 seems like a solid performer.
+
+In summary, we observe clear benefits, particularly in terms of memory usage, and it is worthwhile to explore incorporating these optimizations into your YOLO solution.
+
+Resources that might be worth checking out -
+1. https://developer.nvidia.com/blog/accelerating-transformers-with-nvidia-cudnn-9/
+2. FlashAttention-2: Faster Attention with Better Parallelism and Work Partitioning - https://arxiv.org/pdf/2307.08691
