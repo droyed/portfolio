@@ -16,7 +16,7 @@ x = (v @ attn.transpose(-2, -1)).view(B, C, H, W) + pe(v.reshape(B, C, H, W))
 
 ## Problem statement
 The `ultralytics/nn/modules/block.py` forward call constitutes a critical component of the YOLO inference process. Our objective is to optimize this operation for both memory usage and runtime performance. The optimization strategy specifically targets the memory bottleneck encountered when processing large arrays.
-### Closer Look
+## Closer Look
 
 We begin by establishing the setup of the variables involved and their corresponding shapes relative to the input data:
 
@@ -48,7 +48,7 @@ As the computation involves array operations, the allocated memory must reside i
 It is important to note that this operation internally leverages cuDNN’s batched matrix multiplication capabilities, as described in the [cuDNN Graph Library - Matmul Descriptor](https://docs.nvidia.com/deeplearning/cudnn/backend/latest/api/cudnn-graph-library.html#cudnn-backend-operation-matmul-descriptor). These kernels are highly optimized and provide excellent computational performance. Nevertheless, when operating on very large arrays, memory latency associated with accessing such extensive data becomes the dominant bottleneck.
 
 Moreover, larger YOLO models, such as `YOLOv11-L` and `YOLOv11-X`, necessitate the allocation of even larger intermediate arrays, further amplifying peak memory consumption. This effect is compounded by the additional scaling and softmax operations, each of which also requires the allocation of arrays with similar memory footprints.
-### Proposal
+## Proposal
 
 In the original implementation, all reduction operations — namely matrix multiplications and the softmax function — are performed along the last two axes of the tensors. Accordingly, a straightforward loop-based reformulation involves iterating over the first two axes while maintaining vectorized operations across the final two axes. The primary objective of this approach is to minimize peak memory consumption and enhance reduction efficiency. Transitioning matrix multiplications to a loop-based structure primarily requires appropriate indexing, whereas adapting the softmax operation, owing to its associative property, necessitates no substantial modifications.
 
@@ -121,7 +121,7 @@ for i in range(M):
 x = var2.view(B, C, H, W)  + self.pe(v.reshape(B, C, H, W))
 ```
 
-### Benchmarking
+## Benchmarking
 
 As part of the benchmarking process, we aim to evaluate both the runtime and memory improvements. Specifically, we benchmark the original and proposed solutions with respect to memory consumption and execution time. For this evaluation, the input argument `imgsz` is set to 2560 × 2560. The `predict` method in YOLO processes an image through multiple passes within `ultralytics/nn/modules/block.py`, with the number of passes varying based on the model size as compiled below -
 
@@ -148,7 +148,7 @@ Let's use approach #0, the original approach, as our baseline for comparison -
 As previously discussed and now observed, the final approach is primarily suited for highly memory-constrained scenarios, achieving an impressive 99.6% reduction in memory usage compared to the baseline. However, this comes at the cost of significantly degraded runtime performance. Therefore, we shift our focus to the other approaches. To better highlight the relevant figures, we exclude the final approach and re-plot the results accordingly, as shown below -
 ![[attention_optimization___plots_allapproaches_but last 1.png]]
 
-### Key Observations
+## Key Observations
 
 - The primary advantage of the proposed solution is the significant memory savings of up to ~75%, with these gains becoming even more substantial as model size increases. Importantly, this likely shifts the peak memory usage of the YOLO inference pipeline away from this section of code. This shift is critical, as it enables the use of larger YOLO models that might otherwise be infeasible due to memory constraints, thereby avoiding a fallback to smaller, less capable models and preserving overall solution performance.
 - Additionally, a modest runtime improvement of approximately 5–9% further contributes to the overall efficiency gains.
