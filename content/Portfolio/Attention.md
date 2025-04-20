@@ -122,3 +122,22 @@ x = var2.view(B, C, H, W)  + self.pe(v.reshape(B, C, H, W))
 ### Benchmarking
 
 As part of the benchmarking process, we aim to evaluate both the runtime and memory improvements. Specifically, we benchmark the original and proposed solutions with respect to memory consumption and execution time. For this evaluation, the input argument `imgsz` is set to 2560 × 2560. The `predict` method in YOLO processes an image through multiple passes within `ultralytics/nn/modules/block.py`, with the number of passes varying based on the model size as compiled below -
+
+| Model     | Number of passes to Attention/forward call |
+| --------- | ------------------------------------------ |
+| yolov11-n | 2                                          |
+| yolov11-s | 2                                          |
+| yolov11-m | 2                                          |
+| yolov11-l | 4                                          |
+| yolov11-x | 4                                          |
+
+These observations highlight that, with larger models, it becomes increasingly critical to optimize the forward call. Each pass processes arrays of identical shapes. For the benchmarking process, we select the best-performing pass in terms of runtime skipping the first run. For memory usage, we consider the worst-case scenario, as the best-case results may benefit from internal caching mechanisms. The results are summarized below.
+
+| **Model** | **Approach #0** |                 | **Approach #1** |                 | **Approach #2** |                 | **Approach #3** |                 |
+| --------- | --------------- | --------------- | --------------- | --------------- | --------------- | --------------- | --------------- | --------------- |
+|           | **Mem (MB)**    | **Runtime (s)** | **Mem (MB)**    | **Runtime (s)** | **Mem (MB)**    | **Runtime (s)** | **Mem (MB)**    | **Runtime (s)** |
+| yolov11-n | 625             | 0.0125          | 471.88          | 0.0115          | 471.88          | 0.0116          | 9.4             | 2.677           |
+| yolov11-m | 1249.28         | 0.024           | 475             | 0.0225          | 475             | 0.0228          | 18.77           | 5.31            |
+| yolov11-x | 1873.92         | 0.0348          | 478.12          | 0.0333          | 478.12          | 0.0325          | 28.15           | 8.0073          |
+
+Let's use approach #0, the original approach, as our baseline for comparison. 
