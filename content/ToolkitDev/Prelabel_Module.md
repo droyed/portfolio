@@ -33,11 +33,10 @@ The gap was clear: YOLO speaks Python objects, Label Studio speaks API endpoints
 # Predict with YOLO or SAM on image(s)
 results = model(images)
 
-# Push predictions straight to Label Studio
+# Push predictions straight to Label Studio and visualize
 yolo_to_labelstudio(results)
 
-# 1. Visualize on Label Studio
-# 2. Setup downstream tasks
+# Setup downstream tasks
 ```
 
 That's the core idea behind [`prelabel`](https://github.com/droyed/prelabel) — stay in Python, send your results to Label Studio with a single call, and iterate fast.
