@@ -34,6 +34,7 @@ The gap was clear: YOLO speaks Python objects, Label Studio speaks API endpoints
 results = model(images)
 
 # Push predictions straight to Label Studio and visualize
+from prelabel import yolo_to_labelstudio
 yolo_to_labelstudio(results)
 
 # Setup downstream tasks
