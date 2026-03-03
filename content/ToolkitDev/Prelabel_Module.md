@@ -37,7 +37,7 @@ results = model(images)
 from prelabel import yolo_to_labelstudio
 yolo_to_labelstudio(results)
 
-# Setup downstream tasks
+# Setup downstream tasks accordingly
 ```
 
 That's the core idea behind [`prelabel`](https://github.com/droyed/prelabel) — stay in Python, send your results to Label Studio with a single call, and iterate fast.
