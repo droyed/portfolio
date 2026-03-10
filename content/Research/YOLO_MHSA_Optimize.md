@@ -22,7 +22,9 @@ But there's a catch. That workhorse has an appetite — a _massive_ memory appet
 
 ## The Wall
 
-I was running YOLO inference on high-resolution images — roughly **6000 × 3000 pixels** — using the heaviest models available: **YOLOv11-L** and **YOLOv11-X**. Things were going fine until they weren't. The process crashed with an out-of-memory error, and the traceback pointed straight at the attention kernel — the exact lines we walked through in the last post:
+Suppose one fine day you're working with the best model on a problem and — boom — you hit an out-of-memory exception on GPU VRAM. At that point, you really only have two options: drop down to a smaller model and accept weaker predictions, or fall back to CPU and accept glacial runtimes. Neither is great.
+
+Something exactly like that happened to me last year while working with YOLO11 models. I was running **YOLO11x** on a very high-resolution image — roughly **6000 × 3000 pixels** — of streets with pedestrians. Things were going fine until they weren't. The process crashed with an out-of-memory error, and the traceback pointed straight at the attention kernel — the exact lines we walked through in the last post:
 
 ```python
 attn = (q.transpose(-2, -1) @ k) * scale
@@ -33,9 +35,11 @@ x = (v @ attn.transpose(-2, -1)).view(B, C, H, W) + pe(v.reshape(B, C, H, W))
 ![[YOLO26_attention_module_forward_pass_3lines.png]]
 *Figure 1: Visual breakdown of the Q, K, and V matrix operations executed in the three lines of code above. This is derived from the earlier linked post.*
 
+As a quick fix, I tried the next model down — **YOLO11m**. The problem was that I was dealing with far-off pedestrians, just a handful of pixels tall, and the smaller model simply couldn't see them. Accuracy dropped, and for the task at hand, that was a non-starter. I couldn't let it go — and so began the deeper exploration.
+
 This isn't a quirk of one model generation, either — **both YOLO11 and YOLO26 share the same attention kernel implementation**, so the memory bottleneck carries over to both.
 
-The "smart highlighter" ran out of highlighter ink. So the question became: **can we make these three lines cheaper without changing what they compute?**
+The [[YOLO26_Overview_to_MHSAImpl|"smart highlighter"]] ran out of highlighter ink. So the question became: **can we make these three lines cheaper without changing what they compute?**
 
 ## Where the Memory Goes
 
@@ -231,7 +235,7 @@ results = model('path/to/image.jpg')
 
 The patch is global — once applied, every subsequent YOLO model load in the same process uses the optimized attention automatically. No per-model wiring needed.
 
-For benchmarking tools, advanced configuration options, and the full test suite, check the [repo README](https://github.com/<your-username>/yolo-attnopt).
+For benchmarking tools, advanced configuration options, and the full test suite, check the [repo README](https://github.com/droyed/yolo-attnopt).
 
 
 ## Resources
