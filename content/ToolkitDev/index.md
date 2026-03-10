@@ -7,4 +7,4 @@ date: 2026-03-03
 
 Here is a collection of my developer tools and utility modules.
 
-- [[Prelabel_Module]]
+- [[Prelabel_Module|Prelabel Module: From YOLO to Label Studio]]
