@@ -30,6 +30,9 @@ attn = attn.softmax(dim=-1)
 x = (v @ attn.transpose(-2, -1)).view(B, C, H, W) + pe(v.reshape(B, C, H, W))
 ```
 
+![[YOLO26_attention_module_forward_pass_3lines.png]]
+*Figure 1: Visual breakdown of the Q, K, and V matrix operations executed in the three lines of code above.*
+
 This isn't a quirk of one model generation, either — **both YOLO11 and YOLO26 share the same attention kernel implementation**, so the memory bottleneck carries over to both.
 
 The "smart highlighter" ran out of highlighter ink. So the question became: **can we make these three lines cheaper without changing what they compute?**
